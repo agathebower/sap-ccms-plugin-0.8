@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+if [ -z $1 ]
+then
+  echo "no folder for libs provided!"
+  exit 1
+fi
+
+echo "upacking source tarball..."
+tar xjf sap-ccms-plugin-0.8.tar.bz2
+echo "done"
+
+cd ./nagios-sap-ccms/src
+
+echo "calling make..."
+make
+echo "done"
+
+echo "copying libs to $1..."
+sudo mkdir -p $1
+sudo cp -r ./src/sap_moni.so $1
+sudo cp -r ./src/libs/* $1
+echo "done"
+
+echo "copying config files to /etc/sapmon..."
+sudo mkdir -p /etc/sapmon
+sudo ./config/* /etc/sapmon
+echo "done"
+
+echo "exporting linker path..."
+export LD_LBIRARY_PATH=$LD_LIBRARY_PATH:$1
+echo "done"
+
+echo "installation complete"
